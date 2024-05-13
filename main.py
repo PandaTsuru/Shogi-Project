@@ -20,7 +20,7 @@ def main():
         pygame.display.update()
         clock.tick(FPS)
         for event in pygame.event.get():
-            manager.handle_event()
+            manager.handle_event(event)
             if event.type == pygame.QUIT :
                 run = False
     pygame.quit()

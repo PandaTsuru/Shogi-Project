@@ -10,7 +10,7 @@ class Game(Scene):
         self.board = Board()
 
     def render(self, screen:pygame.Surface):
-        pass
+        self.board.draw_tiles(screen)
 
     def update(self):
         pass

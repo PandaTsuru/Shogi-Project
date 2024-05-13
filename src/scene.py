@@ -32,6 +32,6 @@ class SceneManager:
         self.scenes[-1].update()
     
     def handle_event(self, event:pygame.event.Event):
-        self.scenes[-1].handle_event(self, event)
+        self.scenes[-1].handle_event(event)
 
 

@@ -1,0 +1,2 @@
+class Lance:
+    pass
