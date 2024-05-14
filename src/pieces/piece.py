@@ -12,3 +12,5 @@ class Piece:
         self.column = column
 
 
+
+
