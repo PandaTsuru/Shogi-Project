@@ -1,7 +1,7 @@
 import pygame
 from src.scene import Scene, SceneManager
-from src.config import Config
-from src.board import Board
+from config import Config
+from board import Board
 
 class Game(Scene):
     def __init__(self, manager:SceneManager, config:Config):
@@ -11,7 +11,6 @@ class Game(Scene):
 
     def render(self, screen:pygame.Surface):
         self.board.draw_tiles(screen)
-        self.board.draw_pieces(screen)
 
     def update(self):
         pass
