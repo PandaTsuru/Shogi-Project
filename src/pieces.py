@@ -22,6 +22,13 @@ class Pawn(Piece):
     def __init__(self, row, column, player):
         super().__init__(row, column, player, 'P')
 
+    def get_moves(self, row, column, board):
+        self.moves = []
+        if 0 <= row + self.player < len(board):
+            if not board[row + self.player][column].occupying_piece or board[row + self.player][column].occupying_piece.player != self.player:
+                self.moves.append((row + self.player, column))
+            
+
 class Bishop(Piece):
     def __init__(self, row, column, player):
         super().__init__(row, column, player, 'B')
