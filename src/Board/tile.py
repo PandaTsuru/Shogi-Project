@@ -1,4 +1,4 @@
-from src.constants import TILE_SIZE
+from constants import TILE_SIZE
 import pygame
 
 class Tile:

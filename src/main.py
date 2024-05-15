@@ -1,8 +1,8 @@
 import pygame
-from src.constants import WIDTH, HEIGHT, FPS
-from src.scene import SceneManager
-from src.config import Config
-from src.game import Game
+from constants import WIDTH, HEIGHT, FPS
+from Scenes.scene import SceneManager
+from config import Config
+from Scenes.game import Game
 
 
 

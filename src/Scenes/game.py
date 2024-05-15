@@ -1,19 +1,19 @@
 import pygame
-from src.scene import Scene, SceneManager
-from src.config import Config
-from src.board import Board
-from src.constants import TILE_SIZE
+from Scenes.scene import Scene, SceneManager
+from config import Config
+from Board.board import Board
+from constants import TILE_SIZE
 
 class Game(Scene):
     def __init__(self, manager:SceneManager, config:Config):
         super().__init__(manager, config)
         self.winner = None
-        self.board = Board()
+        self.board = Board(9)
         self.selected_piece = None
 
     def select(self, row:int, column:int):
         self.selected_piece = self.board.get_piece(row, column)
-        self.selected_piece.get_moves(row, column, self.board.board)
+        self.selected_piece.get_moves(row, column, self.board)
 
     def make_move(self, move):
         self.board.move_piece(self.selected_piece, move)
