@@ -11,7 +11,7 @@ class Board:
 
     def create_board(self):
         config = 'LNSGKGSNL/0B00000R0/PPPPPPPPP/000000000/000000000/000000000/PPPPPPPPP/0P00000B0/LNSGKGSNL'
-        self.board = [[Tile(i, j, self.tile_image)]*9 for i in range(9)]
+        self.board = [[Tile(i, j, self.tile_image) for j in range(9)] for i in range(9)]
         for i, row in enumerate(config.split('/')):
             for j, char in enumerate(row):
                 if char != '0':
