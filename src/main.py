@@ -15,6 +15,7 @@ def main():
     manager.set(Game(manager, config))
     run = True
     while run :
+        screen.fill('black')
         manager.render(screen)
         manager.update()
         pygame.display.update()

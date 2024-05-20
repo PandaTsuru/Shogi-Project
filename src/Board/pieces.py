@@ -3,13 +3,13 @@ import os
 from constants import selected_asset, TILE_SIZE
 
 class Piece:
-    def __init__(self, row:int, column:int, player:str, notation:str):
+    def __init__(self, row:int, column:int, player:int, notation:str):
         self.row = row
         self.column = column
         self.player = player
         self.notation = notation
         self.moves = []
-        self.image = pygame.transform.scale(pygame.image.load(os.path.join('assets', selected_asset, f'{notation}.png')), (TILE_SIZE, TILE_SIZE)) if player == -1 else pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('assets', selected_asset, f'{notation}.png')), (TILE_SIZE, TILE_SIZE)), 180)
+        self.image = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)) if self.player == -1 else pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)), 180)
 
     def move(self, row, column):
         self.row = row
@@ -17,7 +17,7 @@ class Piece:
 
     def get_moves(self, row, column, board):
         raise NotImplementedError
-    
+     
 
 class Pawn(Piece):
     def __init__(self, row, column, player):
