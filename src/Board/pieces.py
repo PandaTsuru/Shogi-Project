@@ -10,16 +10,12 @@ class Piece:
         self.notation = notation
         self.moves = []
         self.promoted = False
+        self.promotion_declined = False
         self.image = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)) if self.player == -1 else pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)), 180)
 
     def move(self, row, column):
         self.row = row
         self.column = column
-
-    def promote(self):
-        self.promoted = True
-        self.notation = '+'+self.notation
-        self.image = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)) if self.player == -1 else pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)), 180)
 
     def get_moves(self, row, column, board):
         raise NotImplementedError

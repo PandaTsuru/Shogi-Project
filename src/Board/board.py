@@ -1,16 +1,19 @@
 import pygame
-from constants import TILE_SIZE, HEIGHT, WIDTH, selected_asset
+from constants import TILE_SIZE, HEIGHT, WIDTH, selected_asset, MARGIN
 from Board.tile import Tile
 from Board.pieces import *
-from utils import notation_to_piece, generate_piece_images, draw_text, load_image
+from utils import notation_to_piece, generate_piece_images, load_image
+from GUI.text import draw_text
 
 class Board:
     def __init__(self, size):
-        self.tile_image = load_image('assets/boards/tile_wood1.png', (TILE_SIZE, TILE_SIZE))
+        self.tile_image = load_image('assets/boards/tile_wood2.png', (TILE_SIZE, TILE_SIZE))
+        self.board_image = None
         self.size = size
         self.selected_piece = None
         self.current_player = -1
         self.winner = None
+        self.promotion_in_progress = False
         self.piece_images = generate_piece_images(selected_asset, TILE_SIZE)
         self.reserves = {player: {piece: [] for piece in 'PLNSGBR'} for player in (-1, 1)}
         self.create_board()
@@ -51,8 +54,10 @@ class Board:
         self.move_piece(self.selected_piece, move)
         if capture:
             self.capture_piece(capture)
-        if isinstance(self.selected_piece, (Pawn, Knight, Lance, Silver, Rook, Bishop)) and (self.selected_piece.row <= 2 and self.current_player == -1 or self.selected_piece.row >= 6 and self.current_player == 1) and not self.selected_piece.promoted:
-            self.selected_piece.promote()
+        if isinstance(self.selected_piece, (Pawn, Knight, Lance, Silver, Rook, Bishop)) and (self.selected_piece.row <= 2 and self.current_player == -1 or self.selected_piece.row >= 6 and self.current_player == 1) and not self.selected_piece.promoted and not self.selected_piece.promotion_declined:
+            self.promotion_in_progress = True
+            self.selected_piece.moves = []
+            return
         self.change_turn()
 
     def make_drop(self, move):
@@ -80,6 +85,18 @@ class Board:
 
     def remove_piece_from_reserve(self, piece):
         self.reserves[self.current_player][piece.notation].remove(piece)
+    
+    def promote_piece(self):
+        self.selected_piece.promoted = True
+        self.selected_piece.notation = '+'+self.selected_piece.notation
+        self.selected_piece.image = self.piece_images[self.current_player][self.selected_piece.notation]
+        self.promotion_in_progress = False
+        self.change_turn()
+
+    def decline_promotion(self):
+        self.selected_piece.promotion_declined = True
+        self.promotion_in_progress = False
+        self.change_turn()
 
     def change_turn(self):
         self.selected_piece = None
@@ -93,14 +110,21 @@ class Board:
 
     def handle_left_click(self):
         x, y = pygame.mouse.get_pos()
-        row, column = int((y - HEIGHT * 0.1) // TILE_SIZE), int(x // TILE_SIZE)
-        if self.selected_piece and (row, column) in self.selected_piece.moves:
-            if self.selected_piece.row is not None:
-                self.make_move((row, column))
+        row, column = int((y-MARGIN-TILE_SIZE) // TILE_SIZE), int((x-MARGIN) // TILE_SIZE)
+        if not self.promotion_in_progress :
+            if self.selected_piece and (row, column) in self.selected_piece.moves:
+                if self.selected_piece.row is not None:
+                    self.make_move((row, column))
+                else:
+                    self.make_drop((row, column))
             else:
-                self.make_drop((row, column))
-        else:
-            self.select(row, column)
+                self.select(row, column)
+        else :
+            if row == self.selected_piece.row and column == self.selected_piece.column :
+                self.promote_piece()
+            elif row == self.selected_piece.row+1 and column == self.selected_piece.column :
+                self.decline_promotion()
+
 
     def draw(self, screen):
         self.draw_tiles(screen)
@@ -108,14 +132,16 @@ class Board:
         if self.selected_piece:
             self.draw_moves(screen)
         self.draw_reserves(screen)
+        if self.promotion_in_progress :
+            self.draw_promotion(screen)
 
     def draw_tiles(self, screen):
         for i in range(11):
             for j in range(9):
-                screen.blit(self.tile_image, (j * TILE_SIZE, i * TILE_SIZE))
+                screen.blit(self.tile_image, (j*TILE_SIZE+MARGIN, i*TILE_SIZE+MARGIN))
                 if 0 < i < 10:
                     self.board[i - 1][j].draw(screen)
-        pygame.draw.rect(screen, 'black', (0, TILE_SIZE, TILE_SIZE * 9, TILE_SIZE * 9), 2)
+        pygame.draw.rect(screen, 'black', (MARGIN, MARGIN+TILE_SIZE, TILE_SIZE * 9, TILE_SIZE * 9), 2)
 
     def draw_pieces(self, screen):
         for row in self.board:
@@ -125,19 +151,25 @@ class Board:
 
     def draw_moves(self, screen):
         for move in self.selected_piece.moves:
-            pygame.draw.circle(screen, 'grey', (move[1] * TILE_SIZE + TILE_SIZE // 2, move[0] * TILE_SIZE + TILE_SIZE // 2 + TILE_SIZE), TILE_SIZE // 8)
+            pygame.draw.circle(screen, 'grey', (move[1] * TILE_SIZE + TILE_SIZE // 2 + MARGIN, move[0] * TILE_SIZE + TILE_SIZE // 2 + TILE_SIZE + MARGIN), TILE_SIZE // 8)
 
     def draw_reserves(self, screen):
         for i, notation in enumerate('PLNSGBR'):
             self.draw_reserve_piece(screen, notation, i, 1)
             if len(self.reserves[1][notation]) > 1:
-                draw_text(screen, str(len(self.reserves[1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (TILE_SIZE + TILE_SIZE * i, 0))
+                draw_text(screen, str(len(self.reserves[1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (MARGIN + TILE_SIZE + TILE_SIZE * i, MARGIN))
             self.draw_reserve_piece(screen, notation, i, -1)
             if len(self.reserves[-1][notation]) > 1:
-                draw_text(screen, str(len(self.reserves[-1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (TILE_SIZE + TILE_SIZE * i, HEIGHT - TILE_SIZE))
+                draw_text(screen, str(len(self.reserves[-1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (MARGIN + TILE_SIZE + TILE_SIZE * i, HEIGHT - TILE_SIZE - MARGIN))
 
     def draw_reserve_piece(self, screen, notation, i, position):
-        y_pos = 0 if position == 1 else HEIGHT - TILE_SIZE
+        y_pos = MARGIN if position == 1 else HEIGHT - TILE_SIZE - MARGIN
         image = self.piece_images[position][notation]
         image.set_alpha(255 if self.reserves[position][notation] else 100)
-        screen.blit(image, (TILE_SIZE + TILE_SIZE * i, y_pos))
+        screen.blit(image, (MARGIN + TILE_SIZE + TILE_SIZE * i, y_pos))
+
+    def draw_promotion(self, screen):
+        pygame.draw.rect(screen, 'white', (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+1)*TILE_SIZE+MARGIN, TILE_SIZE, TILE_SIZE*2))
+        screen.blit(self.piece_images[self.current_player]['+'+self.selected_piece.notation], (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+1)*TILE_SIZE+MARGIN))
+        screen.blit(self.selected_piece.image, (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+2)*TILE_SIZE+MARGIN))
+        

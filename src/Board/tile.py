@@ -1,12 +1,12 @@
-from constants import TILE_SIZE, HEIGHT
+from constants import TILE_SIZE, HEIGHT, MARGIN
 import pygame
 
 class Tile:
     def __init__(self, row, column):
         self.row = row
         self.column = column
-        self.x = column*TILE_SIZE
-        self.y = row*TILE_SIZE + TILE_SIZE
+        self.x = column*TILE_SIZE + MARGIN
+        self.y = row*TILE_SIZE + TILE_SIZE + MARGIN
         self.occupying_piece = None
         self.highlight_color = None
 

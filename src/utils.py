@@ -17,8 +17,3 @@ def generate_piece_images(asset:str, tile_size:int):
         images[1][notation] = pygame.transform.rotate(load_image(path, (tile_size, tile_size)), 180)
     return images
 
-def draw_text(screen:pygame.Surface, text:str, font:pygame.font.Font, color:str, topleft:tuple[int, int]):
-    text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect()
-    text_rect.topleft = topleft
-    screen.blit(text_surface, text_rect)

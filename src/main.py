@@ -5,7 +5,6 @@ from config import Config
 from Scenes.game import Game
 
 
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -15,7 +14,7 @@ def main():
     manager.set(Game(manager, config))
     run = True
     while run :
-        screen.fill('black')
+        screen.fill('lightblue')
         manager.render(screen)
         manager.update()
         pygame.display.update()

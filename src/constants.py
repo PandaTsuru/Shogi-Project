@@ -3,11 +3,12 @@ from math import ceil
 
 user32 = ctypes.windll.user32
 
-HEIGHT = user32.GetSystemMetrics(1)-100
-WIDTH = HEIGHT//11*9
+TILE_SIZE = (user32.GetSystemMetrics(1)-100)//12
+MARGIN = TILE_SIZE//2
+WIDTH = TILE_SIZE*9 + 2*MARGIN
+HEIGHT = TILE_SIZE*11 + 2*MARGIN
 FPS = 60
-TILE_SIZE = ceil(HEIGHT/11)
 
 
-selected_asset = 'military'
+selected_asset = 'international'
 
