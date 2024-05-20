@@ -10,6 +10,7 @@ class Board:
         self.size = size
         self.selected_piece = None
         self.current_player = -1
+        self.winner = None
         self.piece_images = generate_piece_images(selected_asset, TILE_SIZE)
         self.reserves = {player: {piece: [] for piece in 'PLNSGBR'} for player in (-1, 1)}
         self.create_board()
@@ -50,6 +51,8 @@ class Board:
         self.move_piece(self.selected_piece, move)
         if capture:
             self.capture_piece(capture)
+        if isinstance(self.selected_piece, (Pawn, Knight, Lance, Silver, Rook, Bishop)) and (self.selected_piece.row <= 2 and self.current_player == -1 or self.selected_piece.row >= 6 and self.current_player == 1) and not self.selected_piece.promoted:
+            self.selected_piece.promote()
         self.change_turn()
 
     def make_drop(self, move):
@@ -60,11 +63,14 @@ class Board:
         self.board[piece.row][piece.column].occupying_piece = None
         self.board[move[0]][move[1]].occupying_piece = piece
         piece.move(*move)
-        self.selected_piece = None
 
     def capture_piece(self, piece):
-        piece.__init__(None, None, self.current_player)
-        self.reserves[self.current_player][piece.notation].append(piece)
+        if piece.notation != 'K':
+            piece.__init__(None, None, self.current_player)
+            self.reserves[self.current_player][piece.notation].append(piece)
+        else :
+            self.winner = self.current_player
+            print(f'{'black' if self.winner == 1 else 'white'} win')
 
     def place_piece(self, piece, move):
         self.board[move[0]][move[1]].occupying_piece = piece
@@ -76,6 +82,7 @@ class Board:
         self.reserves[self.current_player][piece.notation].remove(piece)
 
     def change_turn(self):
+        self.selected_piece = None
         self.current_player *= -1
 
     def get_piece(self, row, column):

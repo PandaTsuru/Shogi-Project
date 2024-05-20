@@ -22,6 +22,10 @@ class Game(Scene):
         if event.type == pygame.MOUSEBUTTONDOWN :
             if pygame.mouse.get_pressed()[0]:
                 self.board.handle_left_click()
+        elif event.type == pygame.KEYDOWN :
+            if event.key == pygame.K_r :
+                self.board = Board(9)
+
 
         
     
