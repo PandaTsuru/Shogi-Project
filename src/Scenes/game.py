@@ -21,6 +21,8 @@ class Game(Scene):
         elif event.type == pygame.KEYDOWN :
             if event.key == pygame.K_r :
                 self.board = Board(9)
+            if event.key == pygame.K_ESCAPE :
+                self.manager.go_back()
 
 
         

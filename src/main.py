@@ -1,8 +1,7 @@
 import pygame
 from Scenes.scene import SceneManager
 from config import Config
-from Scenes.game import Game
-
+from Scenes.menu import MainMenu
 
 def main():
     pygame.init()
@@ -10,7 +9,7 @@ def main():
     screen = pygame.display.set_mode((config.width, config.height))
     clock = pygame.time.Clock()
     manager = SceneManager()
-    manager.set(Game(manager, config))
+    manager.set(MainMenu(manager, config))
     run = True
     while run :
         screen.fill('lightblue')

@@ -23,7 +23,7 @@ class SceneManager:
     def go_to(self, scene:Scene):
         self.scenes.append(scene)
     
-    def go_back(self, scene:Scene):
+    def go_back(self):
         self.scenes.pop()
         
     def render(self, screen:pygame.Surface):

@@ -5,7 +5,7 @@ from GUI.text import Label
 class RectButton:
     def __init__(self, x:int, y:int, width:int, height:int, color:str, text:str, font:str, text_color:str, command):
         self.rect = pygame.Rect(x-width//2, y-height//2, width, height)
-        self.label = Label(self.rect.center, text, font, text_color)
+        self.label = Label(self.rect.center, text, pygame.font.Font(font, self.rect.height), text_color)
         self.color = color
         self.command = command
 
