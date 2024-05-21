@@ -1,7 +1,8 @@
 import pygame
+from config import Config
 
 class Scene:
-    def __init__(self, manager, config):
+    def __init__(self, manager, config:Config):
         self.manager = manager
         self.config = config
         

@@ -1,31 +1,32 @@
 import pygame
-from constants import TILE_SIZE, HEIGHT, WIDTH, selected_asset, MARGIN
 from Board.tile import Tile
 from Board.pieces import *
 from utils import notation_to_piece, generate_piece_images, load_image
 from GUI.text import draw_text
+from config import Config
 
 class Board:
-    def __init__(self, size):
-        self.tile_image = load_image('assets/boards/tile_wood2.png', (TILE_SIZE, TILE_SIZE))
+    def __init__(self, config:Config, size:int):
+        self.config = config
+        self.tile_image = load_image('assets/boards/tile_wood2.png', (self.config.tile_size, self.config.tile_size))
         self.board_image = None
         self.size = size
         self.selected_piece = None
         self.current_player = -1
         self.winner = None
         self.promotion_in_progress = False
-        self.piece_images = generate_piece_images(selected_asset, TILE_SIZE)
+        self.piece_images = generate_piece_images(self.config.piece_asset, self.config.tile_size)
         self.reserves = {player: {piece: [] for piece in 'PLNSGBR'} for player in (-1, 1)}
         self.create_board()
 
     def create_board(self):
         config = 'LNSGKGSNL/0B00000R0/PPPPPPPPP/000000000/000000000/000000000/PPPPPPPPP/0R00000B0/LNSGKGSNL'
-        self.board = [[Tile(i, j) for j in range(9)] for i in range(9)]
+        self.board = [[Tile(i, j, self.config.tile_size) for j in range(9)] for i in range(9)]
         for i, row in enumerate(config.split('/')):
             for j, char in enumerate(row):
                 if char != '0':
                     player = 1 if i < 3 else -1
-                    self.board[i][j].occupying_piece = notation_to_piece(char)(i, j, player)
+                    self.board[i][j].occupying_piece = notation_to_piece(char)(i, j, player, self.piece_images[player][char])
 
     def select(self, row: int, column: int):
         self.selected_piece = None
@@ -71,7 +72,8 @@ class Board:
 
     def capture_piece(self, piece):
         if piece.notation != 'K':
-            piece.__init__(None, None, self.current_player)
+            piece.__init__(None, None, self.current_player, None)
+            piece.image = self.piece_images[piece.player][piece.notation]
             self.reserves[self.current_player][piece.notation].append(piece)
         else :
             self.winner = self.current_player
@@ -110,7 +112,7 @@ class Board:
 
     def handle_left_click(self):
         x, y = pygame.mouse.get_pos()
-        row, column = int((y-MARGIN-TILE_SIZE) // TILE_SIZE), int((x-MARGIN) // TILE_SIZE)
+        row, column = int((y-self.config.margin-self.config.tile_size) // self.config.tile_size), int((x-self.config.margin) // self.config.tile_size)
         if not self.promotion_in_progress :
             if self.selected_piece and (row, column) in self.selected_piece.moves:
                 if self.selected_piece.row is not None:
@@ -138,10 +140,10 @@ class Board:
     def draw_tiles(self, screen):
         for i in range(11):
             for j in range(9):
-                screen.blit(self.tile_image, (j*TILE_SIZE+MARGIN, i*TILE_SIZE+MARGIN))
+                screen.blit(self.tile_image, (j*self.config.tile_size+self.config.margin, i*self.config.tile_size+self.config.margin))
                 if 0 < i < 10:
                     self.board[i - 1][j].draw(screen)
-        pygame.draw.rect(screen, 'black', (MARGIN, MARGIN+TILE_SIZE, TILE_SIZE * 9, TILE_SIZE * 9), 2)
+        pygame.draw.rect(screen, 'black', (self.config.margin, self.config.margin+self.config.tile_size, self.config.tile_size * 9, self.config.tile_size * 9), 2)
 
     def draw_pieces(self, screen):
         for row in self.board:
@@ -151,25 +153,25 @@ class Board:
 
     def draw_moves(self, screen):
         for move in self.selected_piece.moves:
-            pygame.draw.circle(screen, 'grey', (move[1] * TILE_SIZE + TILE_SIZE // 2 + MARGIN, move[0] * TILE_SIZE + TILE_SIZE // 2 + TILE_SIZE + MARGIN), TILE_SIZE // 8)
+            pygame.draw.circle(screen, 'grey', (move[1] * self.config.tile_size + self.config.tile_size // 2 + self.config.margin, move[0] * self.config.tile_size + self.config.tile_size // 2 + self.config.tile_size + self.config.margin), self.config.tile_size // 8)
 
     def draw_reserves(self, screen):
         for i, notation in enumerate('PLNSGBR'):
             self.draw_reserve_piece(screen, notation, i, 1)
             if len(self.reserves[1][notation]) > 1:
-                draw_text(screen, str(len(self.reserves[1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (MARGIN + TILE_SIZE + TILE_SIZE * i, MARGIN))
+                draw_text(screen, str(len(self.reserves[1][notation])), pygame.font.Font(None, self.config.tile_size // 2), 'black', (self.config.margin + self.config.tile_size + self.config.tile_size * i, self.config.margin))
             self.draw_reserve_piece(screen, notation, i, -1)
             if len(self.reserves[-1][notation]) > 1:
-                draw_text(screen, str(len(self.reserves[-1][notation])), pygame.font.Font(None, TILE_SIZE // 2), 'black', (MARGIN + TILE_SIZE + TILE_SIZE * i, HEIGHT - TILE_SIZE - MARGIN))
+                draw_text(screen, str(len(self.reserves[-1][notation])), pygame.font.Font(None, self.config.tile_size // 2), 'black', (self.config.margin + self.config.tile_size + self.config.tile_size * i, self.config.height - self.config.tile_size - self.config.margin))
 
     def draw_reserve_piece(self, screen, notation, i, position):
-        y_pos = MARGIN if position == 1 else HEIGHT - TILE_SIZE - MARGIN
-        image = self.piece_images[position][notation]
+        y_pos = self.config.margin if position == 1 else self.config.height - self.config.tile_size - self.config.margin
+        image = self.piece_images[position][notation].copy()
         image.set_alpha(255 if self.reserves[position][notation] else 100)
-        screen.blit(image, (MARGIN + TILE_SIZE + TILE_SIZE * i, y_pos))
+        screen.blit(image, (self.config.margin + self.config.tile_size + self.config.tile_size * i, y_pos))
 
     def draw_promotion(self, screen):
-        pygame.draw.rect(screen, 'white', (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+1)*TILE_SIZE+MARGIN, TILE_SIZE, TILE_SIZE*2))
-        screen.blit(self.piece_images[self.current_player]['+'+self.selected_piece.notation], (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+1)*TILE_SIZE+MARGIN))
-        screen.blit(self.selected_piece.image, (self.selected_piece.column*TILE_SIZE+MARGIN, (self.selected_piece.row+2)*TILE_SIZE+MARGIN))
+        pygame.draw.rect(screen, 'white', (self.selected_piece.column*self.config.tile_size+self.config.margin, (self.selected_piece.row+1)*self.config.tile_size+self.config.margin, self.config.tile_size, self.config.tile_size*2))
+        screen.blit(self.piece_images[self.current_player]['+'+self.selected_piece.notation], (self.selected_piece.column*self.config.tile_size+self.config.margin, (self.selected_piece.row+1)*self.config.tile_size+self.config.margin))
+        screen.blit(self.selected_piece.image, (self.selected_piece.column*self.config.tile_size+self.config.margin, (self.selected_piece.row+2)*self.config.tile_size+self.config.margin))
         

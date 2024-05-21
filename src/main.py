@@ -1,5 +1,4 @@
 import pygame
-from constants import WIDTH, HEIGHT, FPS
 from Scenes.scene import SceneManager
 from config import Config
 from Scenes.game import Game
@@ -7,9 +6,9 @@ from Scenes.game import Game
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    clock = pygame.time.Clock()
     config = Config()
+    screen = pygame.display.set_mode((config.width, config.height))
+    clock = pygame.time.Clock()
     manager = SceneManager()
     manager.set(Game(manager, config))
     run = True
@@ -18,7 +17,7 @@ def main():
         manager.render(screen)
         manager.update()
         pygame.display.update()
-        clock.tick(FPS)
+        clock.tick(config.fps)
         for event in pygame.event.get():
             manager.handle_event(event)
             if event.type == pygame.QUIT :

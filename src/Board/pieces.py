@@ -1,9 +1,7 @@
 import pygame
-import os
-from constants import selected_asset, TILE_SIZE
 
 class Piece:
-    def __init__(self, row:int, column:int, player:int, notation:str):
+    def __init__(self, row:int, column:int, player:int, notation:str, image:pygame.Surface):
         self.row = row
         self.column = column
         self.player = player
@@ -11,7 +9,7 @@ class Piece:
         self.moves = []
         self.promoted = False
         self.promotion_declined = False
-        self.image = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)) if self.player == -1 else pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join('assets', 'pieces', selected_asset, f'{self.notation}.png')), (TILE_SIZE, TILE_SIZE)), 180)
+        self.image = image
 
     def move(self, row, column):
         self.row = row
@@ -22,8 +20,8 @@ class Piece:
      
 
 class Pawn(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'P')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'P', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
@@ -36,8 +34,8 @@ class Pawn(Piece):
             
 
 class Bishop(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'B')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'B', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
@@ -62,8 +60,8 @@ class Bishop(Piece):
 
 
 class Rook(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'R')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'R', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
@@ -86,8 +84,8 @@ class Rook(Piece):
                         self.moves.append((row+dy, column+dx))
 
 class Knight(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'N')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'N', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
@@ -100,8 +98,8 @@ class Knight(Piece):
             Gold.get_moves(self, row, column, board)
 
 class Gold(Piece):
-        def __init__(self, row, column, player):
-            super().__init__(row, column, player, 'G')
+        def __init__(self, row, column, player, image):
+            super().__init__(row, column, player, 'G', image)
 
         def get_moves(self, row, column, board):
             self.moves = []
@@ -112,8 +110,8 @@ class Gold(Piece):
 
 
 class Silver(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'S')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'S', image)
 
     def get_moves(self, row, column, board):
             self.moves = []
@@ -126,8 +124,8 @@ class Silver(Piece):
                 Gold.get_moves(self, row, column, board)
 
 class Lance(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'L')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'L', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
@@ -148,8 +146,8 @@ class Lance(Piece):
             
                                     
 class King(Piece):
-    def __init__(self, row, column, player):
-        super().__init__(row, column, player, 'K')
+    def __init__(self, row, column, player, image):
+        super().__init__(row, column, player, 'K', image)
 
     def get_moves(self, row, column, board):
         self.moves = []
