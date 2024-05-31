@@ -31,6 +31,7 @@ class Pawn(Piece):
                     self.moves.append((row + self.player, column))
         else :
             Gold.get_moves(self, row, column, board)
+        return self.moves
             
 
 class Bishop(Piece):
@@ -56,6 +57,7 @@ class Bishop(Piece):
             for dx, dy in zip((1, -1, 0, 0), (0, 0, 1, -1)):
                 if 0 <= row + dy < board.size and 0 <= column + dx < board.size :
                     self.moves.append((row+dy, column+dx))
+        return self.moves
 
 
 
@@ -82,6 +84,7 @@ class Rook(Piece):
                 for dy in (-1, 1):
                     if 0 <= row + dy < board.size and 0 <= column + dx < board.size :
                         self.moves.append((row+dy, column+dx))
+        return self.moves
 
 class Knight(Piece):
     def __init__(self, row, column, player, image):
@@ -96,6 +99,7 @@ class Knight(Piece):
                         self.moves.append((row+self.player*2, column+dx))
         else :
             Gold.get_moves(self, row, column, board)
+        return self.moves
 
 class Gold(Piece):
         def __init__(self, row, column, player, image):
@@ -107,6 +111,7 @@ class Gold(Piece):
                 if 0 <= row + dy < board.size and 0 <= column + dx < board.size :
                     if not board.get_piece(row+dy, column+dx) or board.get_piece(row+dy, column+dx).player != self.player :
                         self.moves.append((row+dy, column+dx))
+            return self.moves
 
 
 class Silver(Piece):
@@ -122,6 +127,7 @@ class Silver(Piece):
                             self.moves.append((row+dy, column+dx))
             else :
                 Gold.get_moves(self, row, column, board)
+            return self.moves
 
 class Lance(Piece):
     def __init__(self, row, column, player, image):
@@ -143,6 +149,7 @@ class Lance(Piece):
                     break
         else :
             Gold.get_moves(self, row, column, board)
+        return self.moves
             
                                     
 class King(Piece):
@@ -156,6 +163,7 @@ class King(Piece):
                 if 0 <= row + i < board.size and 0 <= column+j < board.size :
                     if not board.get_piece(row+i, column+j) or board.get_piece(row+i, column+j).player != self.player :
                         self.moves.append((row+i, column+j))
+        return self.moves
 
 
 
